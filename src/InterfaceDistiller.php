@@ -220,7 +220,10 @@ class InterfaceDistiller
     {
         $reflector = new \ReflectionClass($this->reflectionClass);
         if(!empty($this->classDocPattern)) {
-            if(!$doc = $reflector->getDocComment()) return;
+            if(!$doc = $reflector->getDocComment()) {
+                $this->matchedClass = false;
+                return;
+            }
             if(!preg_match_all($this->classDocPattern, $doc)) {
                 $this->matchedClass = false;
                 return;
