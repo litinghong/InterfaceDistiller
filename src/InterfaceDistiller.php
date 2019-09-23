@@ -58,6 +58,10 @@ class InterfaceDistiller
      * @var string
      */
     protected $classDocPattern;
+    /**
+     * @var bool
+     */
+    protected $matchedClass = true;
 
     /**
      * @var \SplFileObject
@@ -85,6 +89,8 @@ class InterfaceDistiller
         $this->excludeTraitMethods = false;
         $this->methodModifiers = \ReflectionMethod::IS_PUBLIC;
         $this->methodDocPattern = '';
+        $this->classDocPattern = '';
+        $this->matchedClass = true;
         $this->pcrePattern = '';
         $this->reflectionClass = null;
         $this->saveAs = null;
@@ -200,6 +206,7 @@ class InterfaceDistiller
      */
     public function distill($fromClassName, $intoInterfaceName)
     {
+        if(!$this->matchedClass) return;
         $this->reflectionClass = $fromClassName;
         $this->distillate->setInterfaceName($intoInterfaceName);
         $this->prepareDistillate();
@@ -214,7 +221,10 @@ class InterfaceDistiller
         $reflector = new \ReflectionClass($this->reflectionClass);
         if(!empty($this->classDocPattern)) {
             if(!$doc = $reflector->getDocComment()) return;
-            if(!preg_match_all($this->classDocPattern, $doc)) return;
+            if(!preg_match_all($this->classDocPattern, $doc)) {
+                $this->matchedClass = false;
+                return;
+            }
         }
         $iterator = new \ArrayIterator(
             $reflector->getMethods($this->methodModifiers)
