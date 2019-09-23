@@ -1,8 +1,8 @@
 {
-    "name": "gooh/interface-distiller",
+    "name": "litinghong/interface-distiller",
     "description": "Derives Interfaces from the API of a class",
     "type": "library",
-    "version": "1.0.4",
+    "version": "1.1.0",
     "bin": ["bin/Distiller"],
     "keywords": ["reflection","generator","interface"],
     "license": "MIT",
