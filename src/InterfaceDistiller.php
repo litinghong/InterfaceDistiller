@@ -50,6 +50,11 @@ class InterfaceDistiller
     protected $pcrePattern;
 
     /**
+     * @var string
+     */
+    protected $docPattern;
+
+    /**
      * @var \SplFileObject
      */
     protected $saveAs;
@@ -74,6 +79,7 @@ class InterfaceDistiller
         $this->excludeOldStyleConstructors = false;
         $this->excludeTraitMethods = false;
         $this->methodModifiers = \ReflectionMethod::IS_PUBLIC;
+        $this->docPattern = '';
         $this->pcrePattern = '';
         $this->reflectionClass = null;
         $this->saveAs = null;
@@ -155,6 +161,15 @@ class InterfaceDistiller
     }
 
     /**
+     * @param string $docPattern
+     * @return \com\github\gooh\InterfaceDistiller\InterfaceDistiller
+     */
+    public function filterDocByPattern($docPattern) {
+        $this->docPattern = $docPattern;
+        return $this;
+    }
+
+    /**
      * @param \SplFileObject $fileObject
      * @return \com\github\gooh\InterfaceDistiller\InterfaceDistiller
      */
@@ -200,6 +215,9 @@ class InterfaceDistiller
     {
         if ($this->pcrePattern) {
             $iterator = new Filters\RegexMethodIterator($iterator, $this->pcrePattern);
+        }
+        if ($this->docPattern) {
+            $iterator = new Filters\RegexDocIterator($iterator, $this->docPattern);
         }
         if ($this->excludeImplementedMethods) {
             $iterator = new Filters\NoImplementedMethodsIterator($iterator);
