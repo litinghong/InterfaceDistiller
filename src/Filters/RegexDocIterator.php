@@ -25,6 +25,10 @@ class RegexDocIterator extends \FilterIterator
      */
     public function accept()
     {
-        return (bool) preg_match($this->pcrePattern, $this->current()->getDocComment());
+        if($doc = $this->current()->getDocComment()) {
+            return (bool) preg_match($this->pcrePattern, $doc);
+        }
+
+        return false;
     }
 }
