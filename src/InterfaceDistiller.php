@@ -206,7 +206,6 @@ class InterfaceDistiller
      */
     public function distill($fromClassName, $intoInterfaceName)
     {
-        if(!$this->matchedClass) return;
         $this->reflectionClass = $fromClassName;
         $this->distillate->setInterfaceName($intoInterfaceName);
         $this->prepareDistillate();
@@ -273,6 +272,7 @@ class InterfaceDistiller
      */
     protected function writeDistillate()
     {
+        if(!$this->matchedClass) return;
         $writer = new Distillate\Writer($this->saveAs);
         $writer->writeToFile($this->distillate);
     }
