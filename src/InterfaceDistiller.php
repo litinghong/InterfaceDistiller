@@ -52,7 +52,12 @@ class InterfaceDistiller
     /**
      * @var string
      */
-    protected $docPattern;
+    protected $methodDocPattern;
+
+    /**
+     * @var string
+     */
+    protected $classDocPattern;
 
     /**
      * @var \SplFileObject
@@ -79,7 +84,7 @@ class InterfaceDistiller
         $this->excludeOldStyleConstructors = false;
         $this->excludeTraitMethods = false;
         $this->methodModifiers = \ReflectionMethod::IS_PUBLIC;
-        $this->docPattern = '';
+        $this->methodDocPattern = '';
         $this->pcrePattern = '';
         $this->reflectionClass = null;
         $this->saveAs = null;
@@ -164,8 +169,17 @@ class InterfaceDistiller
      * @param string $docPattern
      * @return \com\github\gooh\InterfaceDistiller\InterfaceDistiller
      */
-    public function filterDocByPattern($docPattern) {
-        $this->docPattern = $docPattern;
+    public function filterMethodDocByPattern($docPattern) {
+        $this->methodDocPattern = $docPattern;
+        return $this;
+    }
+
+    /**
+     * @param string $docPattern
+     * @return \com\github\gooh\InterfaceDistiller\InterfaceDistiller
+     */
+    public function filterClassDocByPattern($docPattern) {
+        $this->classDocPattern = $docPattern;
         return $this;
     }
 
@@ -198,6 +212,10 @@ class InterfaceDistiller
     protected function prepareDistillate()
     {
         $reflector = new \ReflectionClass($this->reflectionClass);
+        if(!empty($this->classDocPattern)) {
+            if(!$doc = $reflector->getDocComment()) return;
+            if(!preg_match_all($this->classDocPattern, $doc)) return;
+        }
         $iterator = new \ArrayIterator(
             $reflector->getMethods($this->methodModifiers)
         );
@@ -216,8 +234,8 @@ class InterfaceDistiller
         if ($this->pcrePattern) {
             $iterator = new Filters\RegexMethodIterator($iterator, $this->pcrePattern);
         }
-        if ($this->docPattern) {
-            $iterator = new Filters\RegexDocIterator($iterator, $this->docPattern);
+        if ($this->methodDocPattern) {
+            $iterator = new Filters\RegexDocIterator($iterator, $this->methodDocPattern);
         }
         if ($this->excludeImplementedMethods) {
             $iterator = new Filters\NoImplementedMethodsIterator($iterator);
